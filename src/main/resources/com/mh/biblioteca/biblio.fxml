@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="Menu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" stylesheets="@../../../CSS/biblio.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mh.biblioteca.BiblioController">
+   <children>
+      <AnchorPane id="panelesmenu" prefHeight="1080.0" prefWidth="1920.0" stylesheets="@../../../CSS/biblio.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <ScrollPane fx:id="scrollpane" fitToWidth="true" layoutX="1062.0" layoutY="315.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="68.0">
+               <content>
+                  <GridPane fx:id="gridlibros" hgap="20.0" vgap="20.0">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="-Infinity" prefHeight="320.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                  </GridPane>
+               </content>
+            </ScrollPane>
+            <AnchorPane id="panelbusquedas" fx:id="Panelbusquedas" layoutY="88.0" minHeight="-Infinity" minWidth="-Infinity" onMouseExited="#cerrarmenubusquedas" prefHeight="992.0" prefWidth="326.0" style="-fx-background-color: #2FC1DB;" stylesheets="@../../../CSS/biblio.css" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="68.0">
+               <children>
+                  <ImageView fx:id="imagenlibros" fitHeight="332.0" fitWidth="208.0" layoutX="60.0" layoutY="666.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="60.0" AnchorPane.rightAnchor="61.46666259765624" AnchorPane.topAnchor="665.8">
+                     <image>
+                        <Image url="@../../../img/librosgif1.gif" />
+                     </image>
+                  </ImageView>
+                  <Label layoutX="107.0" layoutY="14.0" text="Búsqueda" textFill="WHITE">
+                     <font>
+                        <Font name="Ebrima Bold" size="24.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="txtbusquedas" layoutX="45.0" layoutY="75.0" prefHeight="26.0" prefWidth="208.0" />
+                  <Button id="botontransparente" fx:id="btbuscar" layoutX="253.0" layoutY="65.0" mnemonicParsing="false" onAction="#pressbtbuscar" prefHeight="46.0" prefWidth="40.0" stylesheets="@../../../CSS/biblio.css">
+                     <graphic>
+                        <ImageView fx:id="imgperfil13" fitHeight="38.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../img/lupa.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <GridPane layoutX="42.0" layoutY="161.0" prefHeight="258.0" prefWidth="242.0" AnchorPane.leftAnchor="42.0" AnchorPane.rightAnchor="42.799999999999955" AnchorPane.topAnchor="161.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.5999755859375" minWidth="10.0" prefWidth="144.8" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="142.00000610351566" minWidth="10.0" prefWidth="74.4" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <CheckBox fx:id="cbbiografias" mnemonicParsing="false" text="Biografías" textFill="WHITE">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbciencia" mnemonicParsing="false" text="Ciencia" textFill="WHITE" GridPane.rowIndex="1">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbarte" mnemonicParsing="false" text="Arte y Fotografía" textFill="WHITE" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbfilosofia" mnemonicParsing="false" text="Filosofía" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbcomics" mnemonicParsing="false" text="Cómics" textFill="WHITE" GridPane.columnIndex="1">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbcocina" mnemonicParsing="false" text="Cocina" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbdeporte" mnemonicParsing="false" text="Deporte" textFill="WHITE" GridPane.rowIndex="3">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbdrama" mnemonicParsing="false" text="Drama" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbficcion" mnemonicParsing="false" text="Ficción" textFill="WHITE" GridPane.rowIndex="4">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbfantasia" mnemonicParsing="false" text="Fantasía" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbhumor" mnemonicParsing="false" text="Humor" textFill="WHITE" GridPane.rowIndex="5">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbterror" mnemonicParsing="false" text="Terror" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbviajes" mnemonicParsing="false" text="Viajes" textFill="WHITE" GridPane.rowIndex="6">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbthrillers" mnemonicParsing="false" text="Thirllers" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbpoesia" mnemonicParsing="false" text="Poesía" textFill="WHITE" GridPane.rowIndex="7">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbinfantil" mnemonicParsing="false" text="Infantil" textFill="WHITE" GridPane.rowIndex="8">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbmisterio" mnemonicParsing="false" text="Misterio" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="cbnovelas" mnemonicParsing="false" text="Novelas" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                           <font>
+                              <Font name="Ebrima Bold" size="14.0" />
+                           </font>
+                        </CheckBox>
+                     </children>
+                  </GridPane>
+                  <CheckBox layoutX="78.0" layoutY="476.0" mnemonicParsing="false" text="Mostrar sólo disponibles" textFill="WHITE" AnchorPane.leftAnchor="78.0" AnchorPane.rightAnchor="60.19999999999999" AnchorPane.topAnchor="476.0">
+                     <font>
+                        <Font name="Ebrima Bold" size="14.0" />
+                     </font>
+                  </CheckBox>
+               </children>
+            </AnchorPane>
+            <Button id="botontransparente" fx:id="btmenubusqueda" mnemonicParsing="false" onAction="#pressbtmenubusqueda" prefHeight="66.0" prefWidth="85.0" stylesheets="@../../../CSS/biblio.css" text="&gt;" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="68.0">
+               <graphic>
+                  <ImageView fx:id="imgperfil12" fitHeight="55.0" fitWidth="58.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../img/lupagif.gif" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+         </children>
+      </AnchorPane>
+      <AnchorPane id="panelesmenu" prefHeight="58.0" prefWidth="1920.0" stylesheets="@../../../CSS/biblio.css" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Button id="botontransparente" fx:id="btcuenta" layoutX="1847.0" layoutY="-1.0" mnemonicParsing="false" prefHeight="62.0" prefWidth="52.0" stylesheets="@../../../CSS/biblio.css" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <graphic>
+                  <ImageView fx:id="imgperfil" fitHeight="63.0" fitWidth="57.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../img/usuarionegro.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button id="botontransparente" fx:id="btmenu" mnemonicParsing="false" onAction="#pressbtmenu" prefHeight="66.0" prefWidth="74.0" stylesheets="@../../../CSS/biblio.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <graphic>
+                  <ImageView fx:id="imgperfil1" fitHeight="40.0" fitWidth="47.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../img/btmenu.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button layoutX="698.0" layoutY="20.0" mnemonicParsing="false" onAction="#pressbtanadir" text="añadir" AnchorPane.topAnchor="20.0" />
+         </children>
+      </AnchorPane>
+      <AnchorPane id="panelmenu" fx:id="Paneldesplegable" onMouseExited="#cerrarmenu" prefHeight="1080.0" prefWidth="326.0" stylesheets="@../../../CSS/biblio.css" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <AnchorPane layoutY="6.0" prefHeight="66.0" prefWidth="326.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Button id="botontransparente" fx:id="btmenu1" mnemonicParsing="false" onAction="#pressbtmenu" prefHeight="66.0" prefWidth="74.0" stylesheets="@../../../CSS/biblio.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <graphic>
+                        <ImageView fx:id="imgperfil11" fitHeight="40.0" fitWidth="47.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../img/menuazul.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+               </children>
+            </AnchorPane>
+            <VBox alignment="CENTER" layoutY="357.0" prefHeight="366.0" prefWidth="326.0" spacing="35.0" AnchorPane.bottomAnchor="132.60000000000002" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="357.0">
+               <children>
+                  <Button id="botonesazules" mnemonicParsing="false" prefHeight="43.0" prefWidth="242.0" stylesheets="@../../../CSS/biblio.css" text="BIBLIOTECA" textFill="#3b4343">
+                     <font>
+                        <Font name="Ebrima Bold" size="20.0" />
+                     </font>
+                  </Button>
+                  <Button id="botonesazules" mnemonicParsing="false" prefHeight="43.0" prefWidth="242.0" stylesheets="@../../../CSS/biblio.css" text="MIS LIBROS" textFill="#3b4343">
+                     <font>
+                        <Font name="Ebrima Bold" size="20.0" />
+                     </font>
+                  </Button>
+                  <Button id="botonesazules" mnemonicParsing="false" prefHeight="43.0" prefWidth="242.0" stylesheets="@../../../CSS/biblio.css" text="AJUSTES" textFill="#3b4343">
+                     <font>
+                        <Font name="Ebrima Bold" size="20.0" />
+                     </font>
+                  </Button>
+                  <Button id="botonesazules" mnemonicParsing="false" prefHeight="43.0" prefWidth="242.0" stylesheets="@../../../CSS/biblio.css" text="CONTACTO" textFill="#3b4343">
+                     <font>
+                        <Font name="Ebrima Bold" size="20.0" />
+                     </font>
+                  </Button>
+               </children>
+            </VBox>
+            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="88.0" layoutY="133.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="88.0" AnchorPane.rightAnchor="88.0" AnchorPane.topAnchor="132.6">
+               <image>
+                  <Image url="@../../../img/libros1.png" />
+               </image>
+            </ImageView>
+            <Button id="botontransparente" fx:id="btmenu11" contentDisplay="RIGHT" layoutX="68.0" layoutY="1013.0" mnemonicParsing="false" onAction="#pressbtmenu" prefHeight="66.0" prefWidth="190.0" stylesheets="@../../../CSS/biblio.css" text="CERRAR SESIÓN" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="68.0" AnchorPane.rightAnchor="67.99999999999997">
+               <graphic>
+                  <ImageView fx:id="imgperfil111" fitHeight="40.0" fitWidth="47.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../img/cerrar-sesion.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <font>
+                  <Font name="Ebrima Bold" size="16.0" />
+               </font>
+            </Button>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
