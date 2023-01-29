@@ -324,6 +324,8 @@ public class BiblioController { ;
 
     @FXML
     private TextField txttitulolibro;
+    @FXML
+    private Pane Panelverlibros;
     private Pane panelactual;
 
     public Boolean admin = true;//Debes hacer la consulta al acceder para determinar si es admin o no
@@ -518,6 +520,14 @@ public class BiblioController { ;
                     @Override
                     public void handle(ActionEvent event) {
                         System.out.println(bt.getText());
+                        Panelverlibros.setVisible(true);
+                        if(admin==true){
+                            Panelverusuario.setVisible(false);
+                            Panelveradmin.setVisible(true);
+                        } else if (admin==false) {
+                            Panelverusuario.setVisible(true);
+                            Panelveradmin.setVisible(false);
+                        }
                     }
                 });
             }

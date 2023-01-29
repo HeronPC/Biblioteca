@@ -461,7 +461,7 @@
                   </Button>
                </children>
             </AnchorPane>
-            <AnchorPane id="paneflotante" fx:id="Paneladdlibros1" layoutX="350.0" layoutY="81.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0" minWidth="700.0" prefHeight="737.0" prefWidth="903.0" stylesheets="@../../../CSS/biblio.css" visible="false" AnchorPane.bottomAnchor="71.0" AnchorPane.leftAnchor="340.0" AnchorPane.rightAnchor="340.0" AnchorPane.topAnchor="111.0">
+            <AnchorPane id="paneflotante" fx:id="Panelverlibros" layoutX="350.0" layoutY="81.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0" minWidth="700.0" prefHeight="737.0" prefWidth="903.0" stylesheets="@../../../CSS/biblio.css" visible="false" AnchorPane.bottomAnchor="71.0" AnchorPane.leftAnchor="340.0" AnchorPane.rightAnchor="340.0" AnchorPane.topAnchor="111.0">
                <children>
                   <ScrollPane fx:id="Panelverusuario" fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" stylesheets="@../../../CSS/biblio.css" visible="false" vmax="20.0" vmin="1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="50.0">
                      <content>
