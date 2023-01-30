@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
@@ -21,7 +27,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="bibliofondo" fx:id="Menu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" stylesheets="@../../../CSS/biblio.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mh.biblioteca.BiblioController">
+<AnchorPane id="bibliofondo" fx:id="Menu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" stylesheets="@../../../CSS/biblio.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mh.biblioteca.BiblioController">
    <children>
       <AnchorPane id="panelprincipal" fx:id="PanelInicio" layoutY="68.0" prefHeight="200.0" prefWidth="200.0" stylesheets="@../../../CSS/biblio.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -36,8 +42,8 @@
                                     <Font name="Ebrima Bold" size="45.0" />
                                  </font>
                               </Label>
-                              <TextField maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="46.0" prefWidth="422.0" promptText="DNI" />
-                              <PasswordField maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="46.0" prefWidth="422.0" promptText="Contraseña">
+                              <TextField fx:id="txtusuario" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="46.0" prefWidth="422.0" promptText="DNI" />
+                              <PasswordField fx:id="txtcontrasena" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="46.0" prefWidth="422.0" promptText="Contraseña">
                                  <VBox.margin>
                                     <Insets />
                                  </VBox.margin></PasswordField>
@@ -85,7 +91,7 @@
                                                 <Insets />
                                              </GridPane.margin>
                                              <children>
-                                                <TextField fx:id="txtnombreregistro1" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="93.0" prefWidth="415.0" promptText="Nombre Completo">
+                                                <TextField fx:id="txtusuario1" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="93.0" prefWidth="415.0" promptText="Nombre Completo">
                                                    <font>
                                                       <Font name="Ebrima Bold" size="18.0" />
                                                    </font>
@@ -93,7 +99,7 @@
                                                       <Insets />
                                                    </VBox.margin>
                                                 </TextField>
-                                                <TextField fx:id="txtdniregistro1" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="44.0" prefWidth="219.0" promptText="DNI">
+                                                <TextField fx:id="txtdniregister" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="44.0" prefWidth="219.0" promptText="DNI">
                                                    <font>
                                                       <Font name="Ebrima Bold" size="16.0" />
                                                    </font>
@@ -101,7 +107,7 @@
                                                       <Insets />
                                                    </VBox.margin>
                                                 </TextField>
-                                                <TextField fx:id="txtcontrasenaregistro1" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="44.0" prefWidth="219.0" promptText="Contraseña">
+                                                <TextField fx:id="txtpassregister" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="44.0" prefWidth="219.0" promptText="Contraseña">
                                                    <font>
                                                       <Font name="Ebrima Bold" size="16.0" />
                                                    </font>
@@ -113,12 +119,12 @@
                                           </VBox>
                                           <VBox alignment="CENTER_LEFT" prefHeight="320.0" prefWidth="426.0" spacing="60.0" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                                              <children>
-                                                <TextField fx:id="txtemailregistro1" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="44.0" prefWidth="299.0" promptText="Email">
+                                                <TextField fx:id="txtemailregistro" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="44.0" prefWidth="299.0" promptText="Email">
                                                    <font>
                                                       <Font name="Ebrima Bold" size="16.0" />
                                                    </font>
                                                 </TextField>
-                                                <TextField fx:id="txttelefonoregistro1" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="44.0" prefWidth="219.0" promptText="Teléfono">
+                                                <TextField fx:id="txttelefonoregistro" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="44.0" prefWidth="219.0" promptText="Teléfono">
                                                    <font>
                                                       <Font name="Ebrima Bold" size="16.0" />
                                                    </font>
@@ -137,7 +143,7 @@
                                                       <Font name="Ebrima Bold" size="20.0" />
                                                    </font>
                                                 </Button>
-                                                <Button id="botonesazules" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#pressbtanadir" prefHeight="78.0" prefWidth="242.0" stylesheets="@../../../CSS/biblio.css" text="REGISTRARSE" textFill="#3b4343">
+                                                <Button id="botonesazules" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#pressbtnregister" prefHeight="78.0" prefWidth="242.0" stylesheets="@../../../CSS/biblio.css" text="REGISTRARSE" textFill="#3b4343">
                                                    <font>
                                                       <Font name="Ebrima Bold" size="20.0" />
                                                    </font>
@@ -309,7 +315,7 @@
                               <Font name="Ebrima Bold" size="14.0" />
                            </font>
                         </CheckBox>
-                        <CheckBox fx:id="cbthrillers" mnemonicParsing="false" text="Thirllers" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                        <CheckBox fx:id="cbthrillers" mnemonicParsing="false" text="Thrillers" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="6">
                            <font>
                               <Font name="Ebrima Bold" size="14.0" />
                            </font>
@@ -382,14 +388,11 @@
                                                 <Insets />
                                              </VBox.margin>
                                           </TextField>
-                                          <TextField fx:id="txtgenero" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="44.0" prefWidth="219.0" promptText="Género">
-                                             <font>
-                                                <Font name="Ebrima Bold" size="16.0" />
-                                             </font>
+                                          <ComboBox fx:id="cbgenero" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="44.0" prefWidth="219.0" promptText="Género">
                                              <VBox.margin>
                                                 <Insets />
                                              </VBox.margin>
-                                          </TextField>
+                                          </ComboBox>
                                        </children>
                                        <padding>
                                           <Insets top="80.0" />
@@ -432,7 +435,7 @@
                                           <ImageView fx:id="imglibro" fitHeight="404.0" fitWidth="296.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="12.0" />
                                        </children>
                                     </AnchorPane>
-                                    <Button id="botontransparente" mnemonicParsing="false" onAction="#pressbtaddlibro" prefHeight="62.0" prefWidth="52.0" stylesheets="@../../../CSS/biblio.css" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                    <Button id="botontransparente" fx:id="btnaddlibro" mnemonicParsing="false" onAction="#pressbtaddlibro" prefHeight="62.0" prefWidth="52.0" stylesheets="@../../../CSS/biblio.css" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                        <graphic>
                                           <ImageView fx:id="imgperfil2" fitHeight="63.0" fitWidth="57.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
@@ -463,7 +466,7 @@
             </AnchorPane>
             <AnchorPane id="paneflotante" fx:id="Panelverlibros" layoutX="350.0" layoutY="81.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0" minWidth="700.0" prefHeight="737.0" prefWidth="903.0" stylesheets="@../../../CSS/biblio.css" visible="false" AnchorPane.bottomAnchor="71.0" AnchorPane.leftAnchor="340.0" AnchorPane.rightAnchor="340.0" AnchorPane.topAnchor="111.0">
                <children>
-                  <ScrollPane fx:id="Panelverusuario" fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" stylesheets="@../../../CSS/biblio.css" visible="false" vmax="20.0" vmin="1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="50.0">
+                  <ScrollPane fx:id="Panelverusuario" fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" stylesheets="@../../../CSS/biblio.css" vmax="20.0" vmin="1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="50.0">
                      <content>
                         <AnchorPane id="panelesmenu" minHeight="0.0" minWidth="0.0" prefHeight="842.0" prefWidth="1175.0" stylesheets="@../../../CSS/biblio.css">
                            <children>
@@ -559,15 +562,13 @@
                                           <Insets />
                                        </GridPane.margin>
                                        <children>
-                                          <TextField prefHeight="59.0" prefWidth="588.0" promptText="Título">
+                                          <TextField fx:id="txttituloeditadmin" prefHeight="59.0" prefWidth="588.0" promptText="Título">
                                              <font>
                                                 <Font name="Ebrima Bold" size="18.0" />
                                              </font></TextField>
-                                          <TextField layoutX="10.0" layoutY="202.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="59.0" prefWidth="430.0" promptText="Género">
-                                             <font>
-                                                <Font name="Ebrima Bold" size="18.0" />
-                                             </font></TextField>
-                                          <TextField layoutX="89.0" layoutY="316.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="59.0" prefWidth="430.0" promptText="Autor">
+                                          <ComboBox fx:id="cbgeneroeditadmin" layoutX="10.0" layoutY="202.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="59.0" prefWidth="430.0" promptText="Género">
+                                             </ComboBox>
+                                          <TextField fx:id="txtautoreditadmin" layoutX="89.0" layoutY="316.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="59.0" prefWidth="430.0" promptText="Autor">
                                              <font>
                                                 <Font name="Ebrima Bold" size="18.0" />
                                              </font></TextField>
@@ -578,17 +579,17 @@
                                     </VBox>
                                     <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="50.0" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                                        <children>
-                                          <TextField maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="59.0" prefWidth="430.0" promptText="Editorial">
+                                          <TextField fx:id="txteditorialadmin" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="59.0" prefWidth="430.0" promptText="Editorial">
                                              <font>
                                                 <Font name="Ebrima Bold" size="18.0" />
                                              </font></TextField>
-                                          <TextField layoutX="89.0" layoutY="107.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="59.0" prefWidth="430.0" promptText="ISBN">
+                                          <TextField fx:id="txtisbneditadmin" layoutX="89.0" layoutY="107.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="59.0" prefWidth="430.0" promptText="ISBN">
                                              <font>
                                                 <Font name="Ebrima Bold" size="18.0" />
                                              </font></TextField>
                                           <VBox alignment="CENTER" prefHeight="110.0" prefWidth="138.0" spacing="10.0">
                                              <children>
-                                                <Button id="btslibros" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#pressbteliminar" prefHeight="46.0" prefWidth="138.0" stylesheets="@../../../CSS/biblio.css" text="ELIMINAR">
+                                                <Button id="btslibros" fx:id="bteliminareditadmin" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#pressbteliminarlibros" prefHeight="46.0" prefWidth="138.0" stylesheets="@../../../CSS/biblio.css" text="ELIMINAR">
                                                    <graphic>
                                                       <ImageView fitHeight="38.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                                                          <image>
@@ -597,7 +598,7 @@
                                                       </ImageView>
                                                    </graphic>
                                                 </Button>
-                                                <Button id="btslibros" fx:id="btbuscarusuario111" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#pressbteditar" prefHeight="46.0" prefWidth="138.0" stylesheets="@../../../CSS/biblio.css" text="EDITAR">
+                                                <Button id="btslibros" fx:id="bteditadminlibro" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#pressbteditarlibros" prefHeight="46.0" prefWidth="138.0" stylesheets="@../../../CSS/biblio.css" text="EDITAR">
                                                    <graphic>
                                                       <ImageView fx:id="imgperfil131111" fitHeight="32.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
                                                          <image>
@@ -625,7 +626,7 @@
                                                 <Insets bottom="20.0" />
                                              </VBox.margin>
                                           </Button>
-                                          <TextArea fx:id="txtdescripcion1" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="118.0" prefWidth="312.0" promptText="Descripción" stylesheets="@../../../CSS/biblio.css">
+                                          <TextArea fx:id="txtdescripcioneditadmin" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="118.0" prefWidth="312.0" promptText="Descripción" stylesheets="@../../../CSS/biblio.css">
                                              <font>
                                                 <Font name="Ebrima Bold" size="16.0" />
                                              </font>
