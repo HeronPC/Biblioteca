@@ -25,4 +25,12 @@ telefono CHAR(9),
 nombre VARCHAR(50)
 );
 
+CREATE OR REPLACE TABLE librosuser(
+DNI CHAR(9) PRIMARY KEY,
+ISBN VARCHAR(50) UNIQUE,
+Devolucion DATE,
+FOREIGN KEY (DNI) REFERENCES usuarios (DNI),
+FOREIGN KEY (ISBN) REFERENCES TABLA_BIBLIO (ISBN)
+);
+
 INSERT INTO usuarios (dni, pswd, userroot) VALUES ('root', 'root', 1);

@@ -3,10 +3,10 @@ package com.mh.biblioteca;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -34,17 +34,13 @@ public class BiblioController {
     @FXML
     public ComboBox<String> cbgeneroeditadmin;
 
-    @FXML
-    private TableColumn<?, ?> ColumApellidos;
 
     @FXML
-    private TableColumn<?, ?> ColumContacDevoluciones;
+    private TableColumn<?, ?> ColumNombre;
 
     @FXML
     private TableColumn<?, ?> ColumDNI;
 
-    @FXML
-    private TableColumn<?, ?> ColumEstado;
 
     @FXML
     private TableColumn<?, ?> Columemail;
@@ -98,7 +94,7 @@ public class BiblioController {
     private ScrollPane Panelverusuario;
 
     @FXML
-    private TableView<?> TableUsuarios;
+    private TableView<Usuarios> TableUsuarios;
 
     @FXML
     private VBox Vboxadmin;
@@ -347,10 +343,25 @@ public class BiblioController {
     private TextField txttituloeditadmin;
 
     @FXML
+    private TextField txtnombreUpdate;
+
+    @FXML
+    private TextField txtdniupdate;
+
+    @FXML
+    private TextField txtpassUpdate;
+
+    @FXML
+    private TextField txtemailUpdate;
+
+    @FXML
+    private TextField txttelefonoUpdate;
+
+    @FXML
     private TextField txtautoreditadmin;
 
     @FXML
-    private TextField  txteditorialadmin;
+    private TextField txteditorialadmin;
 
     @FXML
     private TextField txtisbneditadmin;
@@ -442,7 +453,7 @@ public class BiblioController {
                         if (rs.next()) {
                             //Comparamos los datos introducidos por el usuario con la contraseña que nos ha dado la consulta anterior
                             if (Objects.equals(rs.getString(1), txtcontrasena.getText())) {
-                                    admin = rs.getInt(2) == 1;
+                                admin = rs.getInt(2) == 1;
                                 //Abrimos la ventana principal
                                 btmenu.setDisable(false);
                                 PanelIniciar.setVisible(false);
@@ -470,7 +481,7 @@ public class BiblioController {
                 }
                 //Controlamos la excepciones
             } catch (SQLException e) {
-               e.printStackTrace();
+                e.printStackTrace();
             }
         }
     }
@@ -501,6 +512,7 @@ public class BiblioController {
 
     @FXML
     public void pressbtalquilar() {
+
     }
 
     @FXML
@@ -524,8 +536,7 @@ public class BiblioController {
             bdlibros();
             Panelveradmin.setVisible(false);
             PaneLibros.setVisible(true);
-            bdlibros();
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -535,20 +546,19 @@ public class BiblioController {
         try {
             Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
             Statement stat = con.createStatement();
-            if (imageruta==null){
+            if (imageruta == null) {
                 String consul = String.format("Select Foto from tabla_biblio where ISBN = '%s'", txtisbneditadmin.getText());
                 ResultSet rs4 = stat.executeQuery(consul);
-                if(rs4.next()){
+                if (rs4.next()) {
                     imageruta = rs4.getString(1);
                 }
             }
 
-            String st = String.format("update TABLA_BIBLIO set Nombre = '%s', Foto = '%s', Genero = '%s', Autor = '%s', Editorial = '%s', Descripcion = '%s' where ISBN = '%S'", txttituloeditadmin.getText(),
-                    imageruta, cbgeneroeditadmin.getSelectionModel().getSelectedItem(), txtautoreditadmin.getText(), txteditorialadmin.getText(), txtdescripcioneditadmin.getText(), txtisbneditadmin.getText());
+            String st = String.format("update TABLA_BIBLIO set Nombre = '%s', Foto = '%s', Genero = '%s', Autor = '%s', Editorial = '%s', Descripcion = '%s' where ISBN = '%S'", txttituloeditadmin.getText(), imageruta, cbgeneroeditadmin.getSelectionModel().getSelectedItem(), txtautoreditadmin.getText(), txteditorialadmin.getText(), txtdescripcioneditadmin.getText(), txtisbneditadmin.getText());
             stat.execute(st);
             crearalertainfo("Libro actualizado");
             bdlibros();
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -556,17 +566,51 @@ public class BiblioController {
     @FXML
     public void pressbtusuarios() {
         cambiarpanel(panelactual, PanelUsuarios);
+        PaneLibros.setVisible(false);
+        PanelUsuarios.setVisible(true);
         Panelsuperior.setStyle("-fx-opacity: 0.7");
     }
 
-    @FXML
-    public void SelectUsuario() {
+    void rellenarUsuarios() {
+        Connection conexion = null;
+        //Ejecutamos el código en un try para controlar las excepciones
+        try {
+            //Creamos la conexion);
+            conexion = DriverManager.getConnection(conexionbiblio, user, pswd);
+            Statement st = conexion.createStatement();
+            TableUsuarios.getItems().clear();
+            //Creamos la consulta
+            String consulta = "SELECT DNI, Nombre, telefono, email, Pswd, img FROM usuarios";
+            //Guardamos la ejecución de la consulta en la variable rs
+            ResultSet rs = st.executeQuery(consulta);
+            //Bucle para seguir importando datos mientras los haya
+            ObservableList<Usuarios> obsuser = FXCollections.observableArrayList();
+            while (rs.next()) {
+                //ObservableList para guardar dentro el paciente correspondiente para añadirlo a las columnas
+                //Creamos un paciente, con los campos obtenidos de la consulta
+                obsuser.add(new Usuarios(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6)));
+                //Relacionamos la columna con el campo del constructor correcto
+                ColumDNI.setCellValueFactory(new PropertyValueFactory<>("DNI"));
+                ColumNombre.setCellValueFactory(new PropertyValueFactory<>("Nombre"));
+                Columtelefono.setCellValueFactory(new PropertyValueFactory<>("Telefono"));
+                Columemail.setCellValueFactory(new PropertyValueFactory<>("Email"));
+                //Metemos dentro la tabla paciente la lista creada anteriormente
+                TableUsuarios.setItems(obsuser);
+            }
+            //Refrescamos la tabla paciente
+            TableUsuarios.refresh();
+            //Controlamos las excepciones mostrándolas por la terminal
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
     public void pressbtbiblioteca() {
         bdlibros();
-        cambiarpanel(PanelInicio, PaneLibros);
+        cambiarpanel(panelactual, PaneLibros);
+        PaneLibros.setVisible(true);
+        PanelUsuarios.setVisible(false);
         Panelsuperior.setStyle("-fx-opacity: 1");
     }
 
@@ -586,11 +630,7 @@ public class BiblioController {
     public void pressbtanadir() {
         // Agregar filtros para facilitar la busqueda
         fil_chooser.setTitle("Selecciona una imagen");
-        fil_chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("All Images", "*.*"),
-                new FileChooser.ExtensionFilter("JPG", "*.jpg"),
-                new FileChooser.ExtensionFilter("PNG", "*.png")
-        );
+        fil_chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Images", "*.*"), new FileChooser.ExtensionFilter("JPG", "*.jpg"), new FileChooser.ExtensionFilter("PNG", "*.png"));
 
         File file = fil_chooser.showOpenDialog(selec);
 
@@ -606,7 +646,7 @@ public class BiblioController {
                     ex.printStackTrace();
                 }
             }
-            if(Paneladdlibros.isVisible()){
+            if (Paneladdlibros.isVisible()) {
                 try {
                     Path source = file.toPath();
                     Image imagenem = new Image(String.valueOf(source));
@@ -618,12 +658,23 @@ public class BiblioController {
                     ex.printStackTrace();
                 }
             }
-            if(Panelveradmin.isVisible()){
+            if (Panelveradmin.isVisible()) {
                 try {
                     Path source = file.toPath();
                     Image imagenem = new Image(String.valueOf(source));
                     imglibrover1.setImage(imagenem);
                     Path target = Paths.get("src/main/resources/img/imglibros/" + file.getName());
+                    Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            if (PanelEditarUsuario.isVisible()) {
+                try {
+                    Path source = file.toPath();
+                    Image imagenem = new Image(String.valueOf(source));
+                    imgperfilregistro11.setImage(imagenem);
+                    Path target = Paths.get("src/main/resources/img/imgusers/" + file.getName());
                     Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -685,7 +736,7 @@ public class BiblioController {
                 ps2.setString(4, txtemailregistro.getText());
                 ps2.setString(5, txttelefonoregistro.getText());
                 ps2.setString(6, imageruta);
-                ps2.setInt(7 , 0);
+                ps2.setInt(7, 0);
                 System.out.println(imageruta);
                 ps2.executeUpdate();
                 crearalertainfo("Usuario Registrado");
@@ -706,7 +757,6 @@ public class BiblioController {
             }
         }
     }
-
 
     private void comprobrarregister() {
         compregister = false;
@@ -763,6 +813,7 @@ public class BiblioController {
     void bdlibros() {
         int fil = 0;
         int col = 0;
+        gridlibros.getChildren().clear();
         if (admin) {
             col = 1;
             btnuevo = new Button();
@@ -783,6 +834,7 @@ public class BiblioController {
 
 
         gridlibros.setPrefWidth(scrollpane.getPrefWidth());
+
         try {
             listabotones.clear();
             Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
@@ -800,11 +852,10 @@ public class BiblioController {
                 bt.setText(nombre);
                 listabotones.add(bt);
                 //bt.setId(nombre);
-                System.out.println("Nombre Boton " + nombre);
-                if (foto==null){
+                if (foto == null) {
                     String consul = String.format("Select Foto from tabla_biblio where nombre = '%s'", nombre);
                     ResultSet rs4 = st.executeQuery(consul);
-                    if(rs4.next()){
+                    if (rs4.next()) {
                         foto = rs4.getString(1);
                     }
                 }
@@ -841,32 +892,32 @@ public class BiblioController {
         }
     }
 
-    void rellenartext(ActionEvent event){
+    void rellenartext(ActionEvent event) {
         Button botonclick = (Button) event.getSource();
         if (admin) {
-            try{
+            try {
                 Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
                 Statement st2 = con.createStatement();
                 for (int i = 0; i < listabotones.size() - 1; i++) {
-                    System.out.println(listabotones.get(i).getText()+" Boton " + i);
-                        String consulta2 = String.format("SELECT * FROM TABLA_BIBLIO where Nombre = '%s'", botonclick.getText());
-                        System.out.println("ID= " + botonclick.getId());
-                        ResultSet rs2 = st2.executeQuery(consulta2);
-                        if(rs2.next()){
-                            Panelverusuario.setVisible(false);
-                            Panelveradmin.setVisible(true);
-                            txttituloeditadmin.setText(rs2.getString(2));
-                            cbgeneroeditadmin.getSelectionModel().select(rs2.getString(4));
-                            txtautoreditadmin.setText(rs2.getString(5));
-                            txteditorialadmin.setText(rs2.getString(6));
-                            txtisbneditadmin.setText(rs2.getString(7));
-                            txtisbneditadmin.setDisable(true);
-                            txtdescripcioneditadmin.setText(rs2.getString(8));
-                            Image imge = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/imglibros/"+rs2.getString(3))));
-                            imglibrover1.setImage(imge);
-                        }
+                    System.out.println(listabotones.get(i).getText() + " Boton " + i);
+                    String consulta2 = String.format("SELECT * FROM TABLA_BIBLIO where Nombre = '%s'", botonclick.getText());
+                    System.out.println("ID= " + botonclick.getId());
+                    ResultSet rs2 = st2.executeQuery(consulta2);
+                    if (rs2.next()) {
+                        Panelverusuario.setVisible(false);
+                        Panelveradmin.setVisible(true);
+                        txttituloeditadmin.setText(rs2.getString(2));
+                        cbgeneroeditadmin.getSelectionModel().select(rs2.getString(4));
+                        txtautoreditadmin.setText(rs2.getString(5));
+                        txteditorialadmin.setText(rs2.getString(6));
+                        txtisbneditadmin.setText(rs2.getString(7));
+                        txtisbneditadmin.setDisable(true);
+                        txtdescripcioneditadmin.setText(rs2.getString(8));
+                        Image imge = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/imglibros/" + rs2.getString(3))));
+                        imglibrover1.setImage(imge);
                     }
-            } catch (Exception ei){
+                }
+            } catch (Exception ei) {
                 ei.printStackTrace();
             }
 
@@ -875,7 +926,6 @@ public class BiblioController {
             Panelveradmin.setVisible(false);
         }
     }
-
 
 
     @FXML
@@ -947,7 +997,7 @@ public class BiblioController {
             clearAddLibro();
             cambiarpanel(Paneladdlibros, Panelbusquedas);
             bdlibros();
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -969,6 +1019,13 @@ public class BiblioController {
     @FXML
     public void pressbtmenu() {
         Paneldesplegable.setVisible(true);
+        if(admin){
+            Vboxadmin.setVisible(true);
+            Vboxusuario.setVisible(false);
+        } else {
+            Vboxusuario.setVisible(true);
+            Vboxadmin.setVisible(false);
+        }
     }
 
     ObservableList<TextField> txtaddlibros = FXCollections.observableArrayList();
@@ -980,19 +1037,69 @@ public class BiblioController {
         btmenu.setDisable(true);
         ObservableList<String> relleno = FXCollections.observableArrayList();
 
-        relleno.addAll("Biografías", "Ciencia", "Cómics", "Filosofía", "Arte y Fotografía", "Cocina", "Deporte", "Drama", "Ficción", "Fantasía",
-                "Humor", "Terror", "Viajes", "Thrillers", "Poesía", "Misterio", "Infantil", "Novelas");
+        relleno.addAll("Biografías", "Ciencia", "Cómics", "Filosofía", "Arte y Fotografía", "Cocina", "Deporte", "Drama", "Ficción", "Fantasía", "Humor", "Terror", "Viajes", "Thrillers", "Poesía", "Misterio", "Infantil", "Novelas");
         cbgenero.setItems(relleno);
         cbgeneroeditadmin.setItems(relleno);
+        rellenarUsuarios();
     }
 
     @FXML
     public void pressbteditar() {
-
+        if (TableUsuarios.getSelectionModel().getSelectedItem() == null) {
+            crearalertaerror("Seleccione un usuario de la tabla");
+        } else {
+            Usuarios uss = TableUsuarios.getSelectionModel().getSelectedItem();
+            txtdniupdate.setDisable(true);
+            txtnombreUpdate.setText(uss.getNombre());
+            txttelefonoUpdate.setText(uss.getTelefono());
+            txtdniupdate.setText(uss.getDNI());
+            txtpassUpdate.setText(uss.getPass());
+            txtemailUpdate.setText(uss.getEmail());
+            Image imge = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/imgusers/" + uss.getFoto())));
+            imgperfilregistro11.setImage(imge);
+            PanelEditarUsuario.setVisible(true);
+        }
     }
 
     @FXML
     public void pressbteliminar() {
+        if (TableUsuarios.getSelectionModel().getSelectedItem() == null) {
+            crearalertaerror("Seleccione un usuario de la tabla");
+        } else {
+            Usuarios uss = TableUsuarios.getSelectionModel().getSelectedItem();
+            try {
+                Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
 
+                String st = String.format("delete from usuarios where DNI = '%s' ", uss.getDNI());
+                Statement stat = con.createStatement();
+                stat.execute(st);
+                crearalertainfo("Usuario borrado");
+                rellenarUsuarios();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @FXML
+    public void pressbteditarusuarios() {
+        try {
+            Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
+            Statement stat = con.createStatement();
+            if (imageruta == null) {
+                String consul = String.format("Select img from usuarios where DNI = '%s'", txtdniupdate.getText());
+                ResultSet rs4 = stat.executeQuery(consul);
+                if (rs4.next()) {
+                    imageruta = rs4.getString(1);
+                }
+            }
+            String st = String.format("update usuarios set Nombre = '%s', img = '%s', Pswd = '%s', Telefono = '%s', Email = '%s' where DNI = '%S'", txtnombreUpdate.getText(), imageruta, txtpassUpdate.getText(), txttelefonoUpdate.getText(), txtemailUpdate.getText(), txtdniupdate.getText());
+            stat.execute(st);
+            crearalertainfo("Usuario Actualizado");
+            cambiarpanel(panelactual, PanelUsuarios);
+            rellenarUsuarios();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
