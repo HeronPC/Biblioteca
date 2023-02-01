@@ -5,13 +5,19 @@ USE BIBLIO;
 CREATE or replace TABLE TABLA_BIBLIO(
 ID INT(5) PRIMARY KEY AUTO_INCREMENT,
 Nombre VARCHAR(60),
-Foto VARCHAR(100),
+Foto VARCHAR(50) UNIQUE,
 Genero VARCHAR(20),
 Autor VARCHAR(50),
 Editorial VARCHAR(50),
 ISBN VARCHAR(50) UNIQUE,
 Descripcion VARCHAR(200),
 stock INT
+);
+
+CREATE OR REPLACE TABLE imagenes(
+Foto VARCHAR(50) UNIQUE,
+nomb VARCHAR(255),
+image BLOB
 );
 
 CREATE or replace TABLE usuarios(
@@ -23,6 +29,14 @@ img VARCHAR(100),
 email VARCHAR(100),
 telefono CHAR(9),
 nombre VARCHAR(50)
+);
+
+CREATE OR REPLACE TABLE librosuser(
+DNI CHAR(9) PRIMARY KEY,
+ISBN VARCHAR(50) UNIQUE,
+Devolucion DATE,
+FOREIGN KEY (DNI) REFERENCES usuarios (DNI),
+FOREIGN KEY (ISBN) REFERENCES TABLA_BIBLIO (ISBN)
 );
 
 INSERT INTO usuarios (dni, pswd, userroot) VALUES ('root', 'root', 1);
