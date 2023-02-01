@@ -168,6 +168,9 @@ public class BiblioController {
     private CheckBox cbviajes;
 
     @FXML
+    private CheckBox cbdisp;
+
+    @FXML
     private GridPane gridlibros;
 
     @FXML
@@ -297,7 +300,7 @@ public class BiblioController {
     //Esta variable tiene el usuario con el que nos conectaremos a la base de datos
     private final String user = "root";
     //Esta es la contraseña del usuario anterior para conectarnos a la base de datos
-    private final String pswd = "root";
+    private final String pswd = "1492";
 
     private Button bt;
 
@@ -559,7 +562,28 @@ public class BiblioController {
 
     @FXML
     void pressbtbuscar() {
-        bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' OR Genero = '%s' ORDER BY Nombre BY Nombre ASC", "%" + txtbusquedas.getText() + "%", "%" + txtbusquedas.getText() + "%"));
+        String gen = String.valueOf(cbselec);
+        if(cbdisp.isSelected()){
+            if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length()<=0){
+                bdlibros("SELECT * FROM TABLA_BIBLIO WHERE Stock = 1");
+            }else if(!Objects.equals(txtbusquedas.getText(), "") && (cbselec.length() <= 0)){
+                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Stock = 1","%" + txtbusquedas.getText() + "%"));
+            }else if(Objects.equals(txtbusquedas.getText(), "") && cbselec.length()>0){
+                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Genero IN (%s) AND Stock = 1 ORDER BY Nombre ASC", gen));
+            } else {
+                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Genero IN (%s) AND Stock = 1 ORDER BY Nombre ASC","%" + txtbusquedas.getText() + "%", gen));
+            }
+        }else{
+            if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length()<=0){
+                bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+            }else if(!Objects.equals(txtbusquedas.getText(), "") && (cbselec.length() <= 0)){
+                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s'","%" + txtbusquedas.getText() + "%"));
+            }else if(Objects.equals(txtbusquedas.getText(), "") && cbselec.length()>0){
+                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Genero IN (%s) ORDER BY Nombre ASC", gen));
+            } else {
+                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Genero IN (%s) ORDER BY Nombre ASC","%" + txtbusquedas.getText() + "%", gen));
+            }
+        }
     }
 
     @FXML
@@ -806,6 +830,7 @@ public class BiblioController {
      */
     @FXML
     void bdlibros(String consult) {
+        System.out.println(consult);
         int fil = 0;
         int col = 0;
         gridlibros.getChildren().clear();
@@ -1068,14 +1093,49 @@ public class BiblioController {
     }
 
     ObservableList<TextField> txtaddlibros = FXCollections.observableArrayList();
-
+    ObservableList<CheckBox> cbs = FXCollections.observableArrayList();
+    StringBuilder cbselec = new StringBuilder();
     @FXML
     void initialize() {
         txtaddlibros.addAll(txttitulolibro, txtgenero, txtautor, txteditorial, txtisbn);
         panelactual = PanelIniciar;
         btmenu.setDisable(true);
         ObservableList<String> relleno = FXCollections.observableArrayList();
+        cbdisp.setOnAction(event -> pressbtbuscar());
+        cbs.addAll(cbthrillers,cbbiografias,cbterror,cbnovelas,cbpoesia,cbmisterio,cbinfantil,cbhumor,cbfilosofia,cbarte,cbviajes,cbficcion,cbdeporte,cbcocina,cbdrama,cbcomics,cbciencia,cbviajes);
+        for (int i = 0; i < cbs.size(); i++) {
+            int finalI = i;
+            int finalI1 = i;
+            cbs.get(i).setOnAction(event ->{
+                if(cbselec.length()<0){
+                    bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+                    return;
+                }
+                if (cbs.get(finalI).isSelected()) {
+                    if (cbselec.length() > 2) {
+                        cbselec.append(", ");
+                    }
+                    cbselec.append("'" + cbs.get(finalI1).getText() + "'");
+                    if (cbselec.length() == 1) {
+                        cbselec.append(")");
+                    }
+                    System.out.println(cbselec);
+                }else{
+                    int startIndex = cbselec.indexOf("'" + cbs.get(finalI1).getText() + "'");
+                    int endIndex = startIndex + cbs.get(finalI1).getText().length() + 3;
+                    cbselec.delete(startIndex, endIndex);
+                    if (cbselec.length() > 2 && cbselec.charAt(cbselec.length() - 2) == ',') {
+                        cbselec.deleteCharAt(cbselec.length() - 2);
+                    }
+                    if (cbselec.length() <= 2) {
+                        cbselec.delete(0, cbselec.length());
+                    }
+                    System.out.println(cbselec);
+                }
+                pressbtbuscar();
 
+            });
+        }
         relleno.addAll("Biografías", "Ciencia", "Cómics", "Filosofía", "Arte y Fotografía", "Cocina", "Deporte", "Drama", "Ficción", "Fantasía", "Humor", "Terror", "Viajes", "Thrillers", "Poesía", "Misterio", "Infantil", "Novelas");
         cbgenero.setItems(relleno);
         cbgeneroeditadmin.setItems(relleno);
