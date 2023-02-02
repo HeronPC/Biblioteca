@@ -285,7 +285,7 @@ public class BiblioController {
     Button btnuevo;
 
     int ultimafila = 0;
-    //
+    //Conector para la base de datos
     private final String conexionbiblio = "jdbc:mysql://localhost:3306/biblio";
     //Esta variable tiene el usuario con el que nos conectaremos a la base de datos
     private final String user = "root";
@@ -312,16 +312,20 @@ public class BiblioController {
 
     private boolean mislibros = true;
 
+    public boolean excepcion = false;
+
     BiblioApplication app = new BiblioApplication();
 
-    private boolean admin;//Debes hacer la consulta al acceder para determinar si es admin o no
+    private boolean admin;
 
+    //Metodo para alterar la visibilidad de dos paneles
     private void cambiarpanel(Pane panel1, Pane panel2) {
         panel1.setVisible(false);
         panel2.setVisible(true);
         panelactual = panel2;
     }
 
+    //Metodo de boton de Login
     @FXML
     public void pressbtacceder() {
         //Definimos conexion como null
@@ -361,7 +365,9 @@ public class BiblioController {
                                 PanelIniciar.setVisible(false);
                                 Panebienvenida.setVisible(true);
                                 panelactual = PanelInicio;
+                                //Comprobamos los baneos del usuario
                                 comprobarbaneos();
+                                //Dependiendo si es admin o no tendra unas opciones u otras
                                 if (admin) {
                                     cambiarpanel(Vboxusuario, Vboxadmin);
                                 } else {
@@ -389,51 +395,59 @@ public class BiblioController {
         }
     }
 
+    //Accion del boton cerrar sesion
     @FXML
     void presslogout(ActionEvent event) throws IOException {
         ((Node) (event.getSource())).getScene().getWindow().hide();
         app.start(new Stage());
     }
 
+    //Accion del boton registrarse
     @FXML
     public void pressbtregistrate() {
         cambiarpanel(panelactual, PanelRegistro);
     }
 
+    //Accion para cerrar el panel del registro
     @FXML
     public void cerrarregistro() {
         cambiarpanel(panelactual, PanelIniciar);
     }
 
+    //Metodo para ocultar los paneles
     @FXML
     public void cerrar(ActionEvent event) {
         Button botonclick = (Button) event.getSource();
         botonclick.getParent().setVisible(false);
     }
 
+    //Metodo devolver
     @FXML
     public void pressbtalquilar() {
         devolver();
     }
 
+    //Metodo para cerrar el menu de las busquedas
     @FXML
     void cerrarmenubusquedas() {
         Panelbusquedas.setVisible(false);
     }
 
+    //Metodo para la busqueda de usuarios en la tabla
     @FXML
     public void pressbtbuscarusuario() {
         if (Objects.equals(txtbuscarusuario.getText(), "")) {
             rellenarUsuarios("SELECT DNI, Nombre, telefono, email, Pswd, img FROM usuarios");
         } else if (!Objects.equals(txtbuscarusuario.getText(), "")) {
             rellenarUsuarios(String.format("\"SELECT DNI, Nombre, telefono, email, Pswd, img FROM usuarios WHERE Nombre LIKE '%s'", "%" + txtbuscarusuario.getText() + "%"));
-        } else if (Objects.equals(txtbuscarusuario.getText(), "")){
+        } else if (Objects.equals(txtbuscarusuario.getText(), "")) {
             rellenarUsuarios(String.format("SELECT DNI, Nombre, telefono, email, Pswd, img FROM usuarios WHERE DNI LIKE '%s' ORDER BY Nombre ASC", "%" + txtbuscarusuario.getText() + "%"));
         } else {
             rellenarUsuarios(String.format("\"SELECT DNI, Nombre, telefono, email, Pswd, img FROM usuarios WHERE email LIKE '%s' ORDER BY Nombre ASC", "%" + txtbuscarusuario.getText() + "%"));
         }
     }
 
+    //Metodo para la eliminacion de los libros
     @FXML
     public void pressbteliminarlibros() {
         try {
@@ -456,6 +470,7 @@ public class BiblioController {
         }
     }
 
+    //Metodo para editar los libros
     @FXML
     public void pressbteditarlibros() {
         try {
@@ -482,6 +497,7 @@ public class BiblioController {
         }
     }
 
+    //Accion para el boton de usuarios
     @FXML
     public void pressbtusuarios() {
         cambiarpanel(panelactual, PanelUsuarios);
@@ -490,6 +506,7 @@ public class BiblioController {
         Panelsuperior.setStyle("-fx-opacity: 0.7");
     }
 
+    //Metodo para rellenar la tabla de usuarios
     void rellenarUsuarios(String consult) {
         Connection conexion;
         //Ejecutamos el código en un try para controlar las excepciones
@@ -504,7 +521,7 @@ public class BiblioController {
             ObservableList<Usuarios> obsuser = FXCollections.observableArrayList();
             while (rs.next()) {
                 //ObservableList para guardar dentro el paciente correspondiente para añadirlo a las columnas
-                //Creamos un paciente, con los campos obtenidos de la consulta
+                //Creamos un usuario, con los campos obtenidos de la consulta
                 obsuser.add(new Usuarios(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6)));
                 //Relacionamos la columna con el campo del constructor correcto
                 ColumDNI.setCellValueFactory(new PropertyValueFactory<>("DNI"));
@@ -514,7 +531,7 @@ public class BiblioController {
                 //Metemos dentro la tabla paciente la lista creada anteriormente
                 TableUsuarios.setItems(obsuser);
             }
-            //Refrescamos la tabla paciente
+            //Refrescamos la tabla usuario
             TableUsuarios.refresh();
             //Controlamos las excepciones mostrándolas por la terminal
         } catch (Exception e) {
@@ -522,6 +539,7 @@ public class BiblioController {
         }
     }
 
+    //Metodo para el boton inicial de biblioteca
     @FXML
     public void pressbtbiblioteca() {
         if (admin) {
@@ -537,6 +555,7 @@ public class BiblioController {
         cbdisp.setVisible(true);
     }
 
+    //Accion para mostrar los libros de cada usuario
     @FXML
     public void pressbtmislibros() {
         mislibros = true;
@@ -547,6 +566,7 @@ public class BiblioController {
         cbdisp.setVisible(false);
     }
 
+    //Metodo del boton buscar
     @FXML
     void pressbtbuscar() {
         String gen = String.valueOf(cbselec);
@@ -598,7 +618,7 @@ public class BiblioController {
                     ResultSet rs = st.executeQuery(String.format("SELECT DNI, ISBN from librosuser where DNI = '%s'", useractual.getDNI()));
                     while (rs.next()) {
                         Statement st2 = con.createStatement();
-                        ResultSet rs2 = st2.executeQuery(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND ISBN = '%s'", "%"  + txtbusquedas.getText() + "%", rs.getString(2)));
+                        ResultSet rs2 = st2.executeQuery(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND ISBN = '%s'", "%" + txtbusquedas.getText() + "%", rs.getString(2)));
                         // Recorrer los resultados obtenidos y mostrarlos en pantalla
                         if (rs2.next()) {
 
@@ -723,6 +743,7 @@ public class BiblioController {
 
     }
 
+    //Boton Añadir archivos al programa y a la base de datos
     @FXML
     public void pressbtanadir() {
         // Agregar filtros para facilitar la busqueda
@@ -751,6 +772,7 @@ public class BiblioController {
         imageruta = file.getName();
     }
 
+    //Metodo para copiar los archivos de los usuarios
     private void copiararchivos2(File file, ImageView imgperfilregistro1) {
         try {
             Path source = file.toPath();
@@ -764,6 +786,7 @@ public class BiblioController {
         }
     }
 
+    //Metodo para copiar los archivos de los libros
     private void copiarArchivos(File file, ImageView imglibrover1) {
         try {
             Path source = file.toPath();
@@ -777,6 +800,7 @@ public class BiblioController {
         }
     }
 
+    //Metodo para crear una alerta de informacion
     void crearalertainfo(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(null);
@@ -795,6 +819,7 @@ public class BiblioController {
         alert.showAndWait();
     }
 
+    //Lo usaremos para limpiar el registro
     private void clearRegistro() {
         txtusuario1.clear();
         txtemailregistro.clear();
@@ -804,6 +829,7 @@ public class BiblioController {
         imgperfilregistro1.setImage(null);
     }
 
+    //Metodo para el boton registro
     @FXML
     public void pressbtnregister() {
         //Definimos conexion como null
@@ -845,6 +871,7 @@ public class BiblioController {
         }
     }
 
+    //Hacemos las comprobaciones del registro
     private void comprobrarregister() {
         compregister = false;
         if (Objects.equals(txtusuario1.getText(), "") || Objects.equals(txtpassregister.getText(), "") || Objects.equals(txtdniregister.getText(), "") || Objects.equals(txtemailregistro.getText(), "") || Objects.equals(txttelefonoregistro.getText(), "")) {
@@ -864,6 +891,7 @@ public class BiblioController {
         }
     }
 
+    //Metodo para controlar que los campos sean numericos
     private static boolean isNumeric(String cadena) {
         //Lo ejecutamos dentro del try para controlar las excepciones
         try {
@@ -878,6 +906,7 @@ public class BiblioController {
         }
     }
 
+    //Metodo para comprobar el login
     private void comprobarlogin() {
         //Definimos complogin como false
         complogin = false;
@@ -896,21 +925,7 @@ public class BiblioController {
         }
     }
 
-    /*
-    void cleanDirectorio(){
-        File directorio = new File("src/main/resources/img/imglibros");
-
-        File[] files = directorio.listFiles();
-        if (files != null){
-            for(File file : files){
-                if(!file.delete()){
-                    System.out.println("No se pudo eliminar el archivo " + file.getName());
-                }
-            }
-        }
-    }
-     */
-
+    //Metodo para exportar las imagenes a la base de datos
     void experimentalists(File file) {
         try {
             Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
@@ -931,31 +946,7 @@ public class BiblioController {
         }
     }
 
-    /*
-    void importarimagenes(){
-        try{
-            Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
-            PreparedStatement ps = con.prepareStatement("SELECT * from imagenes");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()){
-                String foto = rs.getString(1);
-                Blob blob = rs.getBlob(3);
-                byte[] bytes = blob.getBytes(1, (int) blob.length());
-
-                FileOutputStream fos = new FileOutputStream("src/main/resources/img/imglibros/"+foto);
-                fos.write(bytes);
-                fos.close();
-            }
-
-            rs.close();
-            ps.close();
-            con.close();
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-     */
-
+    //Metodo para mostrar los libros al usuario
     @FXML
     void bdlibros(String consult) {
         btnalquiler.setText("ALQUILAR");
@@ -1018,6 +1009,7 @@ public class BiblioController {
         }
     }
 
+    //Metodo para controlar los alquileres y las devoluciones
     private void devolver() {
         if (Objects.equals(btnalquiler.getText(), "ALQUILAR")) {
             try {
@@ -1079,6 +1071,7 @@ public class BiblioController {
         }
     }
 
+    //Metodo para asigna las fotos a cada imagen
     private void asignarfotos(Connection con, String foto) {
         Image img = null;
         try {
@@ -1096,6 +1089,7 @@ public class BiblioController {
         imagenes(img);
     }
 
+    //Metodo para rellenar los textos con los datos de los libros dependiendo de si eres admin o no
     void rellenartext(ActionEvent event) {
         Button botonclick = (Button) event.getSource();
         if (admin) {
@@ -1151,12 +1145,14 @@ public class BiblioController {
         }
     }
 
+    //Metodo para extraer las fotos de la base de datos
     private void extraerfotobdd(Connection con, ResultSet rs2, ImageView imglibrover) throws SQLException {
         PreparedStatement ps = con.prepareStatement("Select image from imagenes where Foto = ?");
         ps.setString(1, rs2.getString(3));
         rsconimg(imglibrover, ps);
     }
 
+    //Metodo para reconocer las imagenes
     private void rsconimg(ImageView imglibrover, PreparedStatement ps) throws SQLException {
         ResultSet rs4 = ps.executeQuery();
         Image imge = null;
@@ -1168,7 +1164,7 @@ public class BiblioController {
         imglibrover.setImage(imge);
     }
 
-
+    //Metodo para rellenar el apartado de mis libros de los usuarios
     @FXML
     void bdmislibros() {
         int fil = 0;
@@ -1208,6 +1204,7 @@ public class BiblioController {
 
     }
 
+    //Metodo para las imagenes
     private void imagenes(Image img) {
         ImageView view = new ImageView();
         view.setImage(img);
@@ -1228,6 +1225,8 @@ public class BiblioController {
         Panelbusquedas.setVisible(true);
     }
 
+
+    //Metodo para añadir el libro a la base de datos
     @FXML
     public void pressbtaddlibro() {
         try {
@@ -1250,11 +1249,18 @@ public class BiblioController {
             } else {
                 bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO where stock = 1");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            if (!excepcion) {
+                throw new MiExcepcion("No fue posible crear la persona");
+            }
+            excepcion = false;
+
+        } catch (MiExcepcion | SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
+
+    //Metodo para limpiar los campos de los libros
     private void clearAddLibro() {
         txttitulolibro.clear();
         txtautor.clear();
@@ -1281,6 +1287,7 @@ public class BiblioController {
         }
     }
 
+    //Accion del boton editar
     @FXML
     public void pressbteditar() throws SQLException {
         Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
@@ -1301,6 +1308,7 @@ public class BiblioController {
         }
     }
 
+    //Metodo para el boton de eliminar usuario
     @FXML
     public void pressbteliminar() {
         if (TableUsuarios.getSelectionModel().getSelectedItem() == null) {
@@ -1330,6 +1338,7 @@ public class BiblioController {
         }
     }
 
+    //Metodo para el boton editar usuarios
     @FXML
     public void pressbteditarusuarios() {
         try {
@@ -1352,6 +1361,7 @@ public class BiblioController {
         }
     }
 
+    //Metodo para comprobar los baneos
     void comprobarbaneos() {
         try {
             Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
