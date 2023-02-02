@@ -114,6 +114,9 @@ public class BiblioController {
     private Button btmenubusqueda;
 
     @FXML
+    private Button btnalquiler;
+
+    @FXML
     private CheckBox cbarte;
 
     @FXML
@@ -300,7 +303,7 @@ public class BiblioController {
     //Esta variable tiene el usuario con el que nos conectaremos a la base de datos
     private final String user = "root";
     //Esta es la contraseña del usuario anterior para conectarnos a la base de datos
-    private final String pswd = "1492";
+    private final String pswd = "root";
 
     private Button bt;
 
@@ -316,6 +319,12 @@ public class BiblioController {
     Stage selec = new Stage();
 
     Usuarios useractual;
+
+    ObservableList<TextField> txtaddlibros = FXCollections.observableArrayList();
+    ObservableList<CheckBox> cbs = FXCollections.observableArrayList();
+    StringBuilder cbselec = new StringBuilder();
+
+    BiblioApplication app = new BiblioApplication();
 
     private boolean admin;//Debes hacer la consulta al acceder para determinar si es admin o no
 
@@ -364,6 +373,7 @@ public class BiblioController {
                                 PanelIniciar.setVisible(false);
                                 Panebienvenida.setVisible(true);
                                 panelactual = PanelInicio;
+                                comprobarbaneos();
                                 if (admin) {
                                     cambiarpanel(Vboxusuario, Vboxadmin);
                                 } else {
@@ -391,8 +401,6 @@ public class BiblioController {
         }
     }
 
-    BiblioApplication app = new BiblioApplication();
-
     @FXML
     void presslogout(ActionEvent event) throws IOException {
         ((Node) (event.getSource())).getScene().getWindow().hide();
@@ -417,39 +425,7 @@ public class BiblioController {
 
     @FXML
     public void pressbtalquilar() {
-        try {
-            Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
-
-            String st = String.format("Select Ban from usuarios where DNI = '%s' ", useractual.getDNI());
-            Statement stat = con.createStatement();
-            ResultSet rs = stat.executeQuery(st);
-            if(rs.next()){
-                LocalDate fechaban = rs.getDate(1).toLocalDate();
-                fechaban = fechaban.minusDays(1);
-                Period tiemporestante = (Period.between(LocalDate.now(), fechaban));
-                if(fechaban.isBefore(LocalDate.now())){
-                    String update = String.format("Update tabla_biblio set stock = 0 where Nombre = '%s'", lbltitulo.getText());
-                    String datoslibro = String.format("Select * from tabla_biblio where nombre = '%s'", lbltitulo.getText());
-                    ResultSet rs3 = stat.executeQuery(datoslibro);
-                    if(rs3.next()){
-                        LocalDate fechaentrega = LocalDate.now().plusDays(30);
-                        java.sql.Date fechaSQL = java.sql.Date.valueOf(fechaentrega);
-                        String insercion = String.format("Insert into librouser values ('%s', '%s', '%s'", useractual.getDNI(), rs3.getString(7), fechaSQL);
-                        stat.executeUpdate(insercion);
-                        stat.executeQuery(update);
-                        System.out.println("Libro asignado");
-                    }
-                } else {
-                    crearalertaerror(String.format("Estas Baneado durante: '%s' años, '%s' meses y '%s' dias", tiemporestante.getYears(), tiemporestante.getMonths(), tiemporestante.getDays()));
-                }
-            }
-            bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
-            Panelveradmin.setVisible(false);
-            PaneLibros.setVisible(true);
-            Panelverlibros.setVisible(false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        devolver();
     }
 
     @FXML
@@ -470,7 +446,11 @@ public class BiblioController {
             Statement stat = con.createStatement();
             stat.execute(st);
             crearalertainfo("Libro borrado");
-            bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+            if (admin) {
+                bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+            } else {
+                bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO where stock = 1");
+            }
             Panelveradmin.setVisible(false);
             PaneLibros.setVisible(true);
             Panelverlibros.setVisible(false);
@@ -495,7 +475,11 @@ public class BiblioController {
             String st = String.format("update TABLA_BIBLIO set Nombre = '%s', Foto = '%s', Genero = '%s', Autor = '%s', Editorial = '%s', Descripcion = '%s' where ISBN = '%S'", txttituloeditadmin.getText(), imageruta, cbgeneroeditadmin.getSelectionModel().getSelectedItem(), txtautoreditadmin.getText(), txteditorialadmin.getText(), txtdescripcioneditadmin.getText(), txtisbneditadmin.getText());
             stat.execute(st);
             crearalertainfo("Libro actualizado");
-            bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+            if (admin) {
+                bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+            } else {
+                bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO where stock = 1");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -545,7 +529,11 @@ public class BiblioController {
 
     @FXML
     public void pressbtbiblioteca() {
-        bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+        if (admin) {
+            bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+        } else {
+            bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO where stock = 1");
+        }
         cambiarpanel(panelactual, PaneLibros);
         PaneLibros.setVisible(true);
         PanelUsuarios.setVisible(false);
@@ -563,25 +551,29 @@ public class BiblioController {
     @FXML
     void pressbtbuscar() {
         String gen = String.valueOf(cbselec);
-        if(cbdisp.isSelected()){
-            if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length()<=0){
+        if (cbdisp.isSelected()) {
+            if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length() <= 0) {
                 bdlibros("SELECT * FROM TABLA_BIBLIO WHERE Stock = 1");
-            }else if(!Objects.equals(txtbusquedas.getText(), "") && (cbselec.length() <= 0)){
-                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Stock = 1","%" + txtbusquedas.getText() + "%"));
-            }else if(Objects.equals(txtbusquedas.getText(), "") && cbselec.length()>0){
+            } else if (!Objects.equals(txtbusquedas.getText(), "") && (cbselec.length() <= 0)) {
+                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Stock = 1", "%" + txtbusquedas.getText() + "%"));
+            } else if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length() > 0) {
                 bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Genero IN (%s) AND Stock = 1 ORDER BY Nombre ASC", gen));
             } else {
-                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Genero IN (%s) AND Stock = 1 ORDER BY Nombre ASC","%" + txtbusquedas.getText() + "%", gen));
+                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Genero IN (%s) AND Stock = 1 ORDER BY Nombre ASC", "%" + txtbusquedas.getText() + "%", gen));
             }
-        }else{
-            if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length()<=0){
-                bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
-            }else if(!Objects.equals(txtbusquedas.getText(), "") && (cbselec.length() <= 0)){
-                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s'","%" + txtbusquedas.getText() + "%"));
-            }else if(Objects.equals(txtbusquedas.getText(), "") && cbselec.length()>0){
+        } else {
+            if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length() <= 0) {
+                if (admin) {
+                    bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+                } else {
+                    bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO where stock = 1");
+                }
+            } else if (!Objects.equals(txtbusquedas.getText(), "") && (cbselec.length() <= 0)) {
+                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s'", "%" + txtbusquedas.getText() + "%"));
+            } else if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length() > 0) {
                 bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Genero IN (%s) ORDER BY Nombre ASC", gen));
             } else {
-                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Genero IN (%s) ORDER BY Nombre ASC","%" + txtbusquedas.getText() + "%", gen));
+                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Genero IN (%s) ORDER BY Nombre ASC", "%" + txtbusquedas.getText() + "%", gen));
             }
         }
     }
@@ -624,7 +616,6 @@ public class BiblioController {
             experimentalists(file);
         } catch (IOException ex) {
             System.out.println();
-
         }
     }
 
@@ -638,10 +629,8 @@ public class BiblioController {
             experimentalists(file);
         } catch (IOException ex) {
             System.out.println();
-
         }
     }
-
 
     void crearalertainfo(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -661,7 +650,6 @@ public class BiblioController {
         alert.showAndWait();
     }
 
-
     private void clearRegistro() {
         txtusuario1.clear();
         txtemailregistro.clear();
@@ -679,12 +667,11 @@ public class BiblioController {
         comprobrarregister();
         //Comprobamos que la variable complogin sea true
         if (compregister) {
-
             //Ejecutamos dentro de un try para controlar posibles excepciones
             try {
                 conexion = DriverManager.getConnection(conexionbiblio, user, pswd);
                 //Creamos la consulta con PreparedStatement
-                PreparedStatement ps2 = conexion.prepareStatement("insert into usuarios (nombre, dni, pswd, email, telefono, img, userroot) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps2 = conexion.prepareStatement("insert into usuarios (nombre, dni, pswd, email, telefono, img, userroot, Ban) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                 ps2.setString(1, txtusuario1.getText());
                 ps2.setString(3, txtpassregister.getText());
                 ps2.setString(2, txtdniregister.getText());
@@ -692,12 +679,12 @@ public class BiblioController {
                 ps2.setString(5, txttelefonoregistro.getText());
                 ps2.setString(6, imageruta);
                 ps2.setInt(7, 0);
+                ps2.setDate(8, Date.valueOf(LocalDate.now()));
                 System.out.println(imageruta);
                 ps2.executeUpdate();
                 crearalertainfo("Usuario Registrado");
                 cambiarpanel(panelactual, PanelIniciar);
                 clearRegistro();
-
                 //Controlamos la excepciones
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -765,7 +752,6 @@ public class BiblioController {
     }
 
     /*
-
     void cleanDirectorio(){
         File directorio = new File("src/main/resources/img/imglibros");
 
@@ -778,9 +764,8 @@ public class BiblioController {
             }
         }
     }
-
-
      */
+
     void experimentalists(File file) {
         try {
             Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
@@ -795,12 +780,11 @@ public class BiblioController {
             ps.close();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
 
     /*
     void importarimagenes(){
@@ -825,12 +809,11 @@ public class BiblioController {
             throw new RuntimeException(e);
         }
     }
-
-
      */
+
     @FXML
     void bdlibros(String consult) {
-        System.out.println(consult);
+        btnalquiler.setText("ALQUILAR");
         int fil = 0;
         int col = 0;
         gridlibros.getChildren().clear();
@@ -852,10 +835,7 @@ public class BiblioController {
             btnuevo.setOnAction(event -> Paneladdlibros.setVisible(true));
             gridlibros.add(btnuevo, 0, 0);
         }
-
-
         gridlibros.setPrefWidth(scrollpane.getPrefWidth());
-
         try {
             listabotones.clear();
             Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
@@ -893,6 +873,67 @@ public class BiblioController {
         }
     }
 
+    private void devolver() {
+        if (Objects.equals(btnalquiler.getText(), "ALQUILAR")) {
+            try {
+                Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
+                String st = String.format("Select Ban from usuarios where DNI = '%s' ", useractual.getDNI());
+                Statement stat = con.createStatement();
+                ResultSet rs = stat.executeQuery(st);
+                if (rs.next()) {
+                    LocalDate fechaban = rs.getDate(1).toLocalDate();
+                    fechaban = fechaban.minusDays(1);
+                    Period tiemporestante = (Period.between(fechaban, LocalDate.now()));
+                    if (LocalDate.now().isAfter(fechaban)) {
+                        String update = String.format("Update tabla_biblio set stock = 0 where Nombre = '%s'", lbltitulo.getText().substring(8));
+                        String datoslibro = String.format("Select * from tabla_biblio where nombre = '%s'", lbltitulo.getText().substring(8));
+                        ResultSet rs3 = stat.executeQuery(datoslibro);
+                        if (rs3.next()) {
+                            LocalDate fechaentrega = LocalDate.now().plusDays(30);
+                            java.sql.Date fechaSQL = java.sql.Date.valueOf(fechaentrega);
+                            String insercion = "Insert into librosuser values (?, ?, ?)";
+                            PreparedStatement insercionPS = con.prepareStatement(insercion);
+                            insercionPS.setString(1, useractual.getDNI());
+                            insercionPS.setString(2, rs3.getString(7));
+                            insercionPS.setDate(3, fechaSQL);
+                            insercionPS.executeUpdate();
+                            stat.executeUpdate(update);
+                            System.out.println("Libro asignado");
+                        }
+                    } else {
+                        crearalertaerror(String.format("Estas Baneado durante: '%s' años, '%s' meses y '%s' dias", tiemporestante.getYears(), tiemporestante.getMonths(), tiemporestante.getDays()));
+                    }
+                }
+                if (admin) {
+                    bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+                } else {
+                    bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO where stock = 1");
+                }
+                Panelveradmin.setVisible(false);
+                PaneLibros.setVisible(true);
+                Panelverlibros.setVisible(false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (Objects.equals(btnalquiler.getText(), "DEVOLVER")) {
+            try {
+                Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
+                String devolucion = String.format("DELETE FROM librosuser where ISBN = '%s'", lblisbn.getText().substring(6));
+                String actualizar = String.format("Update tabla_biblio set stock = 1 where ISBN = '%s'", lblisbn.getText().substring(6));
+                Statement st = con.createStatement();
+                st.executeUpdate(devolucion);
+                st.executeUpdate(actualizar);
+                crearalertainfo("Libro Devuelto");
+                Panelveradmin.setVisible(false);
+                PaneLibros.setVisible(true);
+                Panelverlibros.setVisible(false);
+                bdmislibros();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void asignarfotos(Connection con, String foto) {
         Image img = null;
         try {
@@ -902,7 +943,6 @@ public class BiblioController {
             if (rs4.next()) {
                 Blob blob = rs4.getBlob(1);
                 byte[] bytes = blob.getBytes(1, (int) blob.length());
-
                 img = new Image(new ByteArrayInputStream(bytes));
             }
         } catch (Exception ignored) {
@@ -947,6 +987,7 @@ public class BiblioController {
                 String consulta2 = String.format("SELECT * FROM TABLA_BIBLIO where Nombre = '%s'", botonclick.getText());
                 System.out.println("ID= " + botonclick.getId());
                 ResultSet rs2 = st2.executeQuery(consulta2);
+
                 if (rs2.next()) {
                     Panelverusuario.setVisible(true);
                     Panelverlibros.setVisible(true);
@@ -977,7 +1018,6 @@ public class BiblioController {
         if (rs4.next()) {
             Blob blob = rs4.getBlob(1);
             byte[] bytes = blob.getBytes(1, (int) blob.length());
-
             imge = new Image(new ByteArrayInputStream(bytes));
         }
         imglibrover.setImage(imge);
@@ -989,6 +1029,7 @@ public class BiblioController {
         int fil = 0;
         int col = 0;
         gridlibros.getChildren().clear();
+        btnalquiler.setText("DEVOLVER");
         try {
             Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
 
@@ -997,12 +1038,13 @@ public class BiblioController {
             ResultSet rs = st.executeQuery(consulta);
             while (rs.next()) {
                 String consulta2 = String.format("Select Nombre, Foto from TABLA_BIBLIO where ISBN = '%s'", rs.getString(2));
-                ResultSet rs2 = st.executeQuery(consulta2);
+                Statement st2 = con.createStatement();
+                ResultSet rs2 = st2.executeQuery(consulta2);
                 // Recorrer los resultados obtenidos y mostrarlos en pantalla
                 if (rs2.next()) {
 
-                    String nombre = rs.getString("Nombre");
-                    String foto = rs.getString("Foto");
+                    String nombre = rs2.getString("Nombre");
+                    String foto = rs2.getString("Foto");
                     bt = new Button();
                     bt.setText(nombre);
                     asignarfotos(con, foto);
@@ -1014,11 +1056,11 @@ public class BiblioController {
                         col = 0;
                         fil++;
                     }
-                    bt.setOnAction(event -> System.out.println(bt.getText()));
+                    bt.setOnAction(this::rellenartext);
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
     }
@@ -1060,7 +1102,11 @@ public class BiblioController {
             crearalertainfo("Libro creado");
             clearAddLibro();
             cambiarpanel(Paneladdlibros, Panelbusquedas);
-            bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+            if (admin) {
+                bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+            } else {
+                bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO where stock = 1");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1090,56 +1136,6 @@ public class BiblioController {
             Vboxusuario.setVisible(true);
             Vboxadmin.setVisible(false);
         }
-    }
-
-    ObservableList<TextField> txtaddlibros = FXCollections.observableArrayList();
-    ObservableList<CheckBox> cbs = FXCollections.observableArrayList();
-    StringBuilder cbselec = new StringBuilder();
-    @FXML
-    void initialize() {
-        txtaddlibros.addAll(txttitulolibro, txtgenero, txtautor, txteditorial, txtisbn);
-        panelactual = PanelIniciar;
-        btmenu.setDisable(true);
-        ObservableList<String> relleno = FXCollections.observableArrayList();
-        cbdisp.setOnAction(event -> pressbtbuscar());
-        cbs.addAll(cbthrillers,cbbiografias,cbterror,cbnovelas,cbpoesia,cbmisterio,cbinfantil,cbhumor,cbfilosofia,cbarte,cbviajes,cbficcion,cbdeporte,cbcocina,cbdrama,cbcomics,cbciencia,cbviajes);
-        for (int i = 0; i < cbs.size(); i++) {
-            int finalI = i;
-            int finalI1 = i;
-            cbs.get(i).setOnAction(event ->{
-                if(cbselec.length()<0){
-                    bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
-                    return;
-                }
-                if (cbs.get(finalI).isSelected()) {
-                    if (cbselec.length() > 2) {
-                        cbselec.append(", ");
-                    }
-                    cbselec.append("'" + cbs.get(finalI1).getText() + "'");
-                    if (cbselec.length() == 1) {
-                        cbselec.append(")");
-                    }
-                    System.out.println(cbselec);
-                }else{
-                    int startIndex = cbselec.indexOf("'" + cbs.get(finalI1).getText() + "'");
-                    int endIndex = startIndex + cbs.get(finalI1).getText().length() + 3;
-                    cbselec.delete(startIndex, endIndex);
-                    if (cbselec.length() > 2 && cbselec.charAt(cbselec.length() - 2) == ',') {
-                        cbselec.deleteCharAt(cbselec.length() - 2);
-                    }
-                    if (cbselec.length() <= 2) {
-                        cbselec.delete(0, cbselec.length());
-                    }
-                    System.out.println(cbselec);
-                }
-                pressbtbuscar();
-
-            });
-        }
-        relleno.addAll("Biografías", "Ciencia", "Cómics", "Filosofía", "Arte y Fotografía", "Cocina", "Deporte", "Drama", "Ficción", "Fantasía", "Humor", "Terror", "Viajes", "Thrillers", "Poesía", "Misterio", "Infantil", "Novelas");
-        cbgenero.setItems(relleno);
-        cbgeneroeditadmin.setItems(relleno);
-        rellenarUsuarios();
     }
 
     @FXML
@@ -1172,7 +1168,16 @@ public class BiblioController {
                 Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
 
                 String st = String.format("delete from usuarios where DNI = '%s' ", uss.getDNI());
+                String consulta = String.format("SELECT ISBN from librosuser where DNI = '%s'", uss.getDNI());
                 Statement stat = con.createStatement();
+                ResultSet rs = stat.executeQuery(consulta);
+                while (rs.next()) {
+                    String consulta2 = String.format("Update tabla_biblio set stock = 1 where ISBN = '%s'", rs.getString(1));
+                    Statement st3 = con.createStatement();
+                    st3.executeUpdate(consulta2);
+                }
+                String consulta2 = String.format("DELETE FROM Librosuser where DNI = '%s'", uss.getDNI());
+                stat.execute(consulta2);
                 stat.execute(st);
                 crearalertainfo("Usuario borrado");
                 rellenarUsuarios();
@@ -1202,5 +1207,76 @@ public class BiblioController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    void comprobarbaneos() {
+        try {
+            Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
+            Statement stat = con.createStatement();
+
+            String consulta = String.format("Select * from librosuser where DNI = '%s'", useractual.getDNI());
+            ResultSet rs = stat.executeQuery(consulta);
+            if (!Objects.equals(useractual.getDNI(), "root")) {
+                while (rs.next()) {
+                    if (LocalDate.now().isAfter(rs.getDate(3).toLocalDate())) {
+                        String baneo = String.format("Update usuarios set Ban = '%s' where DNI = '%s'", Date.valueOf(LocalDate.now().plusDays(30)), useractual.getDNI());
+                        Statement st = con.createStatement();
+                        st.executeUpdate(baneo);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void initialize() {
+        txtaddlibros.addAll(txttitulolibro, txtgenero, txtautor, txteditorial, txtisbn);
+        panelactual = PanelIniciar;
+        btmenu.setDisable(true);
+        ObservableList<String> relleno = FXCollections.observableArrayList();
+        cbdisp.setOnAction(event -> pressbtbuscar());
+        cbs.addAll(cbthrillers, cbbiografias, cbterror, cbnovelas, cbpoesia, cbmisterio, cbinfantil, cbhumor, cbfilosofia, cbarte, cbviajes, cbficcion, cbdeporte, cbcocina, cbdrama, cbcomics, cbciencia, cbviajes);
+        for (int i = 0; i < cbs.size(); i++) {
+            int finalI = i;
+            int finalI1 = i;
+            cbs.get(i).setOnAction(event -> {
+                if (cbselec.length() < 0) {
+                    if (admin) {
+                        bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+                    } else {
+                        bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO where stock = 1");
+                    }
+                    return;
+                }
+                if (cbs.get(finalI).isSelected()) {
+                    if (cbselec.length() > 2) {
+                        cbselec.append(", ");
+                    }
+                    cbselec.append("'").append(cbs.get(finalI1).getText()).append("'");
+                    if (cbselec.length() == 1) {
+                        cbselec.append(")");
+                    }
+                    System.out.println(cbselec);
+                } else {
+                    int startIndex = cbselec.indexOf("'" + cbs.get(finalI1).getText() + "'");
+                    int endIndex = startIndex + cbs.get(finalI1).getText().length() + 3;
+                    cbselec.delete(startIndex, endIndex);
+                    if (cbselec.length() > 2 && cbselec.charAt(cbselec.length() - 2) == ',') {
+                        cbselec.deleteCharAt(cbselec.length() - 2);
+                    }
+                    if (cbselec.length() <= 2) {
+                        cbselec.delete(0, cbselec.length());
+                    }
+                    System.out.println(cbselec);
+                }
+                pressbtbuscar();
+            });
+        }
+        relleno.addAll("Biografías", "Ciencia", "Cómics", "Filosofía", "Arte y Fotografía", "Cocina", "Deporte", "Drama", "Ficción", "Fantasía", "Humor", "Terror", "Viajes", "Thrillers", "Poesía", "Misterio", "Infantil", "Novelas");
+        cbgenero.setItems(relleno);
+        cbgeneroeditadmin.setItems(relleno);
+        rellenarUsuarios();
     }
 }

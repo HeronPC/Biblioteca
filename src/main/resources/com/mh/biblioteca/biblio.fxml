@@ -517,7 +517,7 @@
                                                 <Font name="Ebrima Bold" size="21.0" />
                                              </font>
                                           </Label>
-                                          <Button id="botonesazules" mnemonicParsing="false" onAction="#pressbtalquilar" prefHeight="43.0" prefWidth="242.0" stylesheets="@../../../CSS/biblio.css" text="ALQUILAR" textFill="WHITE">
+                                          <Button id="botonesazules" fx:id="btnalquiler" mnemonicParsing="false" onAction="#pressbtalquilar" prefHeight="43.0" prefWidth="242.0" stylesheets="@../../../CSS/biblio.css" text="ALQUILAR" textFill="WHITE">
                                              <font>
                                                 <Font name="Ebrima Bold" size="20.0" />
                                              </font>
