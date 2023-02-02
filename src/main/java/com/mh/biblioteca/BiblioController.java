@@ -102,18 +102,6 @@ public class BiblioController {
     private Button btmenu;
 
     @FXML
-    private Button btnaddlibro;
-
-    @FXML
-    private Button btmenu1;
-
-    @FXML
-    private Button btmenu11;
-
-    @FXML
-    private Button btmenubusqueda;
-
-    @FXML
     private Button btnalquiler;
 
     @FXML
@@ -136,9 +124,6 @@ public class BiblioController {
 
     @FXML
     private CheckBox cbdrama;
-
-    @FXML
-    private CheckBox cbfantasia;
 
     @FXML
     private CheckBox cbficcion;
@@ -230,8 +215,6 @@ public class BiblioController {
     @FXML
     private TextField txtisbn;
 
-    @FXML
-    private TextField txtgenero;
 
     @FXML
     private TextField txtusuario;
@@ -284,6 +267,9 @@ public class BiblioController {
     private TextField txtisbneditadmin;
 
     @FXML
+    private TextField txtbuscarusuario;
+
+    @FXML
     private TextArea txtdescripcioneditadmin;
 
 
@@ -299,6 +285,7 @@ public class BiblioController {
     Button btnuevo;
 
     int ultimafila = 0;
+    //
     private final String conexionbiblio = "jdbc:mysql://localhost:3306/biblio";
     //Esta variable tiene el usuario con el que nos conectaremos a la base de datos
     private final String user = "root";
@@ -320,9 +307,10 @@ public class BiblioController {
 
     Usuarios useractual;
 
-    ObservableList<TextField> txtaddlibros = FXCollections.observableArrayList();
     ObservableList<CheckBox> cbs = FXCollections.observableArrayList();
     StringBuilder cbselec = new StringBuilder();
+
+    private boolean mislibros = true;
 
     BiblioApplication app = new BiblioApplication();
 
@@ -337,7 +325,7 @@ public class BiblioController {
     @FXML
     public void pressbtacceder() {
         //Definimos conexion como null
-        Connection conexion = null;
+        Connection conexion;
         //Ejecutamos el comprobarlogin para controlar posibles fallos a la hora de hacer la consulta
         comprobarlogin();
         //Comprobamos que la variable complogin sea true
@@ -435,6 +423,15 @@ public class BiblioController {
 
     @FXML
     public void pressbtbuscarusuario() {
+        if (Objects.equals(txtbuscarusuario.getText(), "")) {
+            rellenarUsuarios("SELECT DNI, Nombre, telefono, email, Pswd, img FROM usuarios");
+        } else if (!Objects.equals(txtbuscarusuario.getText(), "")) {
+            rellenarUsuarios(String.format("\"SELECT DNI, Nombre, telefono, email, Pswd, img FROM usuarios WHERE Nombre LIKE '%s'", "%" + txtbuscarusuario.getText() + "%"));
+        } else if (Objects.equals(txtbuscarusuario.getText(), "")){
+            rellenarUsuarios(String.format("SELECT DNI, Nombre, telefono, email, Pswd, img FROM usuarios WHERE DNI LIKE '%s' ORDER BY Nombre ASC", "%" + txtbuscarusuario.getText() + "%"));
+        } else {
+            rellenarUsuarios(String.format("\"SELECT DNI, Nombre, telefono, email, Pswd, img FROM usuarios WHERE email LIKE '%s' ORDER BY Nombre ASC", "%" + txtbuscarusuario.getText() + "%"));
+        }
     }
 
     @FXML
@@ -493,18 +490,16 @@ public class BiblioController {
         Panelsuperior.setStyle("-fx-opacity: 0.7");
     }
 
-    void rellenarUsuarios() {
-        Connection conexion = null;
+    void rellenarUsuarios(String consult) {
+        Connection conexion;
         //Ejecutamos el código en un try para controlar las excepciones
         try {
             //Creamos la conexion);
             conexion = DriverManager.getConnection(conexionbiblio, user, pswd);
             Statement st = conexion.createStatement();
             TableUsuarios.getItems().clear();
-            //Creamos la consulta
-            String consulta = "SELECT DNI, Nombre, telefono, email, Pswd, img FROM usuarios";
             //Guardamos la ejecución de la consulta en la variable rs
-            ResultSet rs = st.executeQuery(consulta);
+            ResultSet rs = st.executeQuery(consult);
             //Bucle para seguir importando datos mientras los haya
             ObservableList<Usuarios> obsuser = FXCollections.observableArrayList();
             while (rs.next()) {
@@ -534,48 +529,198 @@ public class BiblioController {
         } else {
             bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO where stock = 1");
         }
+        mislibros = false;
         cambiarpanel(panelactual, PaneLibros);
         PaneLibros.setVisible(true);
         PanelUsuarios.setVisible(false);
         Panelsuperior.setStyle("-fx-opacity: 1");
+        cbdisp.setVisible(true);
     }
 
     @FXML
     public void pressbtmislibros() {
+        mislibros = true;
         bdmislibros();
         cambiarpanel(panelactual, PaneLibros);
         PaneLibros.setVisible(true);
         Panelsuperior.setStyle("-fx-opacity: 1");
+        cbdisp.setVisible(false);
     }
 
     @FXML
     void pressbtbuscar() {
         String gen = String.valueOf(cbselec);
-        if (cbdisp.isSelected()) {
+        if (mislibros) {
             if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length() <= 0) {
-                bdlibros("SELECT * FROM TABLA_BIBLIO WHERE Stock = 1");
-            } else if (!Objects.equals(txtbusquedas.getText(), "") && (cbselec.length() <= 0)) {
-                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Stock = 1", "%" + txtbusquedas.getText() + "%"));
-            } else if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length() > 0) {
-                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Genero IN (%s) AND Stock = 1 ORDER BY Nombre ASC", gen));
-            } else {
-                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Genero IN (%s) AND Stock = 1 ORDER BY Nombre ASC", "%" + txtbusquedas.getText() + "%", gen));
-            }
-        } else {
-            if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length() <= 0) {
-                if (admin) {
-                    bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
-                } else {
-                    bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO where stock = 1");
+                int fil = 0;
+                int col = 0;
+                gridlibros.getChildren().clear();
+                btnalquiler.setText("DEVOLVER");
+                try {
+                    Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
+
+                    Statement st = con.createStatement();
+                    ResultSet rs = st.executeQuery(String.format("SELECT DNI, ISBN from librosuser where DNI = '%s'", useractual.getDNI()));
+                    while (rs.next()) {
+                        Statement st2 = con.createStatement();
+                        ResultSet rs2 = st2.executeQuery(String.format("SELECT * FROM TABLA_BIBLIO WHERE ISBN = '%s'", rs.getString(2)));
+                        // Recorrer los resultados obtenidos y mostrarlos en pantalla
+                        if (rs2.next()) {
+
+                            String nombre = rs2.getString("Nombre");
+                            String foto = rs2.getString("Foto");
+                            bt = new Button();
+                            bt.setText(nombre);
+                            asignarfotos(con, foto);
+                            gridlibros.add(bt, col, fil);
+                            gridlibros.setPrefWidth(scrollpane.getPrefWidth());
+                            col++;
+                            ultimafila = fil + 1;
+                            if (col == 6) {
+                                col = 0;
+                                fil++;
+                            }
+                            bt.setOnAction(this::rellenartext);
+                        }
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             } else if (!Objects.equals(txtbusquedas.getText(), "") && (cbselec.length() <= 0)) {
-                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s'", "%" + txtbusquedas.getText() + "%"));
+                int fil = 0;
+                int col = 0;
+                gridlibros.getChildren().clear();
+                btnalquiler.setText("DEVOLVER");
+                try {
+                    Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
+
+                    Statement st = con.createStatement();
+                    ResultSet rs = st.executeQuery(String.format("SELECT DNI, ISBN from librosuser where DNI = '%s'", useractual.getDNI()));
+                    while (rs.next()) {
+                        Statement st2 = con.createStatement();
+                        ResultSet rs2 = st2.executeQuery(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND ISBN = '%s'", "%"  + txtbusquedas.getText() + "%", rs.getString(2)));
+                        // Recorrer los resultados obtenidos y mostrarlos en pantalla
+                        if (rs2.next()) {
+
+                            String nombre = rs2.getString("Nombre");
+                            String foto = rs2.getString("Foto");
+                            bt = new Button();
+                            bt.setText(nombre);
+                            asignarfotos(con, foto);
+                            gridlibros.add(bt, col, fil);
+                            gridlibros.setPrefWidth(scrollpane.getPrefWidth());
+                            col++;
+                            ultimafila = fil + 1;
+                            if (col == 6) {
+                                col = 0;
+                                fil++;
+                            }
+                            bt.setOnAction(this::rellenartext);
+                        }
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             } else if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length() > 0) {
-                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Genero IN (%s) ORDER BY Nombre ASC", gen));
+                int fil = 0;
+                int col = 0;
+                gridlibros.getChildren().clear();
+                btnalquiler.setText("DEVOLVER");
+                try {
+                    Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
+
+                    Statement st = con.createStatement();
+                    ResultSet rs = st.executeQuery(String.format("SELECT DNI, ISBN from librosuser where DNI = '%s'", useractual.getDNI()));
+                    while (rs.next()) {
+                        Statement st2 = con.createStatement();
+                        ResultSet rs2 = st2.executeQuery(String.format("SELECT * FROM TABLA_BIBLIO WHERE Genero IN (%s) AND ISBN = '%s' ORDER BY Nombre ASC", gen, rs.getString(2)));
+                        // Recorrer los resultados obtenidos y mostrarlos en pantalla
+                        if (rs2.next()) {
+
+                            String nombre = rs2.getString("Nombre");
+                            String foto = rs2.getString("Foto");
+                            bt = new Button();
+                            bt.setText(nombre);
+                            asignarfotos(con, foto);
+                            gridlibros.add(bt, col, fil);
+                            gridlibros.setPrefWidth(scrollpane.getPrefWidth());
+                            col++;
+                            ultimafila = fil + 1;
+                            if (col == 6) {
+                                col = 0;
+                                fil++;
+                            }
+                            bt.setOnAction(this::rellenartext);
+                        }
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             } else {
-                bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Genero IN (%s) ORDER BY Nombre ASC", "%" + txtbusquedas.getText() + "%", gen));
+                int fil = 0;
+                int col = 0;
+                gridlibros.getChildren().clear();
+                btnalquiler.setText("DEVOLVER");
+                try {
+                    Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
+
+                    Statement st = con.createStatement();
+                    ResultSet rs = st.executeQuery(String.format("SELECT DNI, ISBN from librosuser where DNI = '%s'", useractual.getDNI()));
+                    while (rs.next()) {
+                        Statement st2 = con.createStatement();
+                        ResultSet rs2 = st2.executeQuery(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Genero IN (%s) AND ISBN = '%s' ORDER BY Nombre ASC", "%" + txtbusquedas.getText() + "%", gen, rs.getString(2)));
+                        // Recorrer los resultados obtenidos y mostrarlos en pantalla
+                        if (rs2.next()) {
+
+                            String nombre = rs2.getString("Nombre");
+                            String foto = rs2.getString("Foto");
+                            bt = new Button();
+                            bt.setText(nombre);
+                            asignarfotos(con, foto);
+                            gridlibros.add(bt, col, fil);
+                            gridlibros.setPrefWidth(scrollpane.getPrefWidth());
+                            col++;
+                            ultimafila = fil + 1;
+                            if (col == 6) {
+                                col = 0;
+                                fil++;
+                            }
+                            bt.setOnAction(this::rellenartext);
+                        }
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        } else {
+            if (cbdisp.isSelected()) {
+                if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length() <= 0) {
+                    bdlibros("SELECT * FROM TABLA_BIBLIO WHERE Stock = 1");
+                } else if (!Objects.equals(txtbusquedas.getText(), "") && (cbselec.length() <= 0)) {
+                    bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Stock = 1", "%" + txtbusquedas.getText() + "%"));
+                } else if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length() > 0) {
+                    bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Genero IN (%s) AND Stock = 1 ORDER BY Nombre ASC", gen));
+                } else {
+                    bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Genero IN (%s) AND Stock = 1 ORDER BY Nombre ASC", "%" + txtbusquedas.getText() + "%", gen));
+                }
+            } else {
+                if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length() <= 0) {
+                    if (admin) {
+                        bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO");
+                    } else {
+                        bdlibros("SELECT Nombre, Foto FROM TABLA_BIBLIO where stock = 1");
+                    }
+                } else if (!Objects.equals(txtbusquedas.getText(), "") && (cbselec.length() <= 0)) {
+                    bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s'", "%" + txtbusquedas.getText() + "%"));
+                } else if (Objects.equals(txtbusquedas.getText(), "") && cbselec.length() > 0) {
+                    bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Genero IN (%s) ORDER BY Nombre ASC", gen));
+                } else {
+                    bdlibros(String.format("SELECT * FROM TABLA_BIBLIO WHERE Nombre LIKE '%s' AND Genero IN (%s) ORDER BY Nombre ASC", "%" + txtbusquedas.getText() + "%", gen));
+                }
             }
         }
+
     }
 
     @FXML
@@ -1034,12 +1179,10 @@ public class BiblioController {
             Connection con = DriverManager.getConnection(conexionbiblio, user, pswd);
 
             Statement st = con.createStatement();
-            String consulta = String.format("SELECT DNI, ISBN from librosuser where DNI = '%s'", useractual.getDNI());
-            ResultSet rs = st.executeQuery(consulta);
+            ResultSet rs = st.executeQuery(String.format("SELECT DNI, ISBN from librosuser where DNI = '%s'", useractual.getDNI()));
             while (rs.next()) {
-                String consulta2 = String.format("Select Nombre, Foto from TABLA_BIBLIO where ISBN = '%s'", rs.getString(2));
                 Statement st2 = con.createStatement();
-                ResultSet rs2 = st2.executeQuery(consulta2);
+                ResultSet rs2 = st2.executeQuery("SELECT * FROM TABLA_BIBLIO WHERE Stock = 0");
                 // Recorrer los resultados obtenidos y mostrarlos en pantalla
                 if (rs2.next()) {
 
@@ -1180,7 +1323,7 @@ public class BiblioController {
                 stat.execute(consulta2);
                 stat.execute(st);
                 crearalertainfo("Usuario borrado");
-                rellenarUsuarios();
+                rellenarUsuarios("SELECT DNI, Nombre, telefono, email, Pswd, img FROM usuarios");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1203,7 +1346,7 @@ public class BiblioController {
             stat.execute(st);
             crearalertainfo("Usuario Actualizado");
             cambiarpanel(panelactual, PanelUsuarios);
-            rellenarUsuarios();
+            rellenarUsuarios("SELECT DNI, Nombre, telefono, email, Pswd, img FROM usuarios");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1232,7 +1375,6 @@ public class BiblioController {
 
     @FXML
     void initialize() {
-        txtaddlibros.addAll(txttitulolibro, txtgenero, txtautor, txteditorial, txtisbn);
         panelactual = PanelIniciar;
         btmenu.setDisable(true);
         ObservableList<String> relleno = FXCollections.observableArrayList();
@@ -1277,6 +1419,6 @@ public class BiblioController {
         relleno.addAll("Biografías", "Ciencia", "Cómics", "Filosofía", "Arte y Fotografía", "Cocina", "Deporte", "Drama", "Ficción", "Fantasía", "Humor", "Terror", "Viajes", "Thrillers", "Poesía", "Misterio", "Infantil", "Novelas");
         cbgenero.setItems(relleno);
         cbgeneroeditadmin.setItems(relleno);
-        rellenarUsuarios();
+        rellenarUsuarios("SELECT DNI, Nombre, telefono, email, Pswd, img FROM usuarios");
     }
 }
